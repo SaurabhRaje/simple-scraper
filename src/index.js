@@ -37,7 +37,10 @@ const args = Utils.parseArgs(process.argv.slice(2));
             };
 
             Object.assign(pageData, await page.evaluate(selectors => {
-                const data = {};
+                let robots = document.querySelector("meta[name='robots'i]");
+                robots = robots ? robots.content.trim() : null;
+
+                const data = { robots };
                 for (let selector of selectors) {
                     const element = document.querySelector(selector);
                     data[selector] = element ? element.innerText.trim() : "";

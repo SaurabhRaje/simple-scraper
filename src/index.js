@@ -30,7 +30,9 @@ const args = Utils.parseArgs(process.argv.slice(2));
             console.log(`\n[${i + 1} of ${len}]\nFetching "${url}"...`);
             console.time("Query time");
 
-            const response = await page.goto(url, { waitUntil: "domcontentloaded" });
+            const response = await page.goto(url, {
+                waitUntil: args.wait === "load" ? "load" : "domcontentloaded"
+            });
             const pageData = {
                 url,
                 status: response.status()
@@ -42,8 +44,8 @@ const args = Utils.parseArgs(process.argv.slice(2));
 
                 const data = { robots };
                 for (let selector of selectors) {
-                    const element = document.querySelector(selector);
-                    data[selector] = element ? element.innerText.trim() : "";
+                    const elements = Array.from(document.querySelectorAll(selector));
+                    data[selector] = elements.length ? elements.map(e => `"${e.innerText.trim()}"`).join(", ") : "";
                 }
                 return data;
             }, selectors));

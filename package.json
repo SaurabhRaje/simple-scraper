@@ -11,6 +11,6 @@
   "license": "MIT",
   "dependencies": {
     "json-2-csv": "^3.4.1",
-    "puppeteer-core": "^1.14.0"
+    "puppeteer": "^1.16.0"
   }
 }

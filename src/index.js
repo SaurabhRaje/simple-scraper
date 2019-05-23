@@ -1,4 +1,4 @@
-const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer");
 const Utils = require("./js/utils");
 
 const args = Utils.parseArgs(process.argv.slice(2));
@@ -11,7 +11,6 @@ const args = Utils.parseArgs(process.argv.slice(2));
 
     if (Array.isArray(urls) && urls.length) {
         const browser = await puppeteer.launch({
-            executablePath: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
             headless: args.headless !== "n",
             devtools: args.devtools === "y"
         });

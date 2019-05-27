@@ -9,7 +9,9 @@ const parseArgs = (args) => {
             parsedArgs[match[1]] = match[2];
         }
     });
-    console.log("Options:", parsedArgs, "\n");
+    console.log("Options:");
+    console.table(parsedArgs);
+    console.log("");
     return parsedArgs;
 };
 
@@ -17,11 +19,18 @@ const getOutputPath = () => {
     return "dist/csv/";
 };
 
-const getOutputFilename = () => {
+const getOutputFilename = format => {
     const timezoneOffset = new Date().getTimezoneOffset() * 60000;
     const timestamp = new Date(Date.now() - timezoneOffset).toISOString();
-    const filename = timestamp.substr(0, timestamp.indexOf(".")).replace(/\D/g, "-");
-    return filename;
+    switch (format) {
+        case "date":
+            return timestamp.substring(0, timestamp.indexOf("T"));
+        case "time":
+            return timestamp.substring(timestamp.indexOf("T") + 1, timestamp.indexOf(".")).replace(/\D/g, "-");
+        case "datetime":
+        default:
+            return timestamp.substring(0, timestamp.indexOf(".")).replace(/\D/g, "-");
+    }
 };
 
 const readInputFile = filename => {

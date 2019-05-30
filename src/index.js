@@ -63,10 +63,10 @@ const args = Utils.parseArgs(process.argv.slice(2));
             console.time("Query time");
             queryData.push(await getPageData(url));
             console.timeEnd("Query time");
-        }
 
-        const writeResult = await Utils.writeOutputFile(queryData, path, filename);
-        console.log(writeResult);
+            const writeResult = await Utils.writeOutputFile(queryData, path, filename);
+            console.log(writeResult);
+        }
 
         console.log("\nOperation complete");
 

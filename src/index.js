@@ -26,26 +26,29 @@ const args = Utils.parseArgs(process.argv.slice(2));
         const getPageData = url => {
             return new Promise(resolve => {
                 setTimeout(async () => {
-                    const response = await page.goto(url, {
-                        waitUntil: args.wait === "load" ? "load" : "domcontentloaded"
-                    });
+                    const pageData = { url };
 
-                    const pageData = {
-                        url,
-                        status: response.status()
-                    };
-
-                    Object.assign(pageData, await page.evaluate(selectors => {
-                        let robots = document.querySelector("meta[name='robots'i]");
-                        robots = robots ? robots.content.trim() : null;
-
-                        const data = { robots };
-                        for (let selector of selectors) {
-                            const elements = Array.from(document.querySelectorAll(selector));
-                            data[selector] = elements.length ? elements.map(e => `"${e.innerText.trim()}"`).join(", ") : "";
-                        }
-                        return data;
-                    }, selectors));
+                    try {
+                        const response = await page.goto(url, {
+                            waitUntil: args.wait === "load" ? "load" : "domcontentloaded"
+                        });
+                        pageData.status = response.status();
+    
+                        Object.assign(pageData, await page.evaluate(selectors => {
+                            let robots = document.querySelector("meta[name='robots'i]");
+                            robots = robots ? robots.content.trim() : null;
+    
+                            const data = { robots };
+                            for (let selector of selectors) {
+                                const elements = Array.from(document.querySelectorAll(selector));
+                                data[selector] = elements.length ? elements.map(e => `"${e.innerText.trim()}"`).join(", ") : "";
+                            }
+                            return data;
+                        }, selectors));
+                    }
+                    catch (err) {
+                        pageData.status = err instanceof puppeteer.errors.TimeoutError ? 408 : "ERR";
+                    }
 
                     resolve(pageData);
                 }, delay * 1000);

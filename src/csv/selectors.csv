@@ -1,4 +1,0 @@
-﻿query
-body.page--list .list-info__ttl
-.list_header_text
-body:not(.page--list) .list-info__ttl

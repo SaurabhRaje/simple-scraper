@@ -34,20 +34,32 @@ const args = Utils.parseArgs(process.argv.slice(2));
                         });
                         pageData.status = response.status();
     
-                        Object.assign(pageData, await page.evaluate(selectors => {
+                        Object.assign(pageData, await page.evaluate((selectors, format) => {
                             let robots = document.querySelector("meta[name='robots'i]");
                             robots = robots ? robots.content.trim() : null;
     
                             const data = { robots };
                             for (let selector of selectors) {
-                                const elements = Array.from(document.querySelectorAll(selector));
-                                data[selector] = elements.length ? elements.map(e => `"${e.innerText.trim()}"`).join(", ") : "";
+                                if (format === "xpath") {
+                                    const elements = document.evaluate(selector, document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+
+                                    let element = null;
+                                    const contents = [];
+                                    while (element = elements.iterateNext()) {
+                                        contents.push(`"${element.textContent.trim()}"`);
+                                    }
+                                    data[selector] = contents.join(", ");
+                                }
+                                else {
+                                    const elements = Array.from(document.querySelectorAll(selector));
+                                    data[selector] = elements.length ? elements.map(e => `"${e.innerText.trim()}"`).join(", ") : "";
+                                }
                             }
                             return data;
-                        }, selectors));
+                        }, selectors, args.informat));
                     }
                     catch (err) {
-                        pageData.status = err instanceof puppeteer.errors.TimeoutError ? 408 : "ERR";
+                        pageData.status = err instanceof puppeteer.errors.TimeoutError ? 408 : err.message;
                     }
 
                     resolve(pageData);
